@@ -1,15 +1,23 @@
 require "formula"
 
 class Tkgate < Formula
-  homepage ""
-  url "http://pkgs.fedoraproject.org/repo/pkgs/tkgate/tkgate-2.0-b10.tgz/84ffe959868d39ec856b5ff1c70136c3/tkgate-2.0-b10.tgz"
-  sha256 "4ef6a9c5b71325cec0d53d55dfd386a344dc7f139c49e9a145ad4ace7a302057"
+  homepage "https://bitbucket.org/starling13/tkgate"
+  head "https://bitbucket.org/starling13/tkgate", :using => :hg
 
-  depends_on :x11
+  depends_on "cairo" => "with-x11"
+  depends_on "pango" => "with-x11"
+  depends_on "tcl-tk"
 
   patch :DATA
 
   def install
+#    ENV.prepend_path "PKG_CONFIG_LIBDIR", "#{Formula["tcl-tk"].opt_lib}/pkgconfig"
+#    ENV.append_path "PKG_CONFIG_PATH", "#{Formula["tcl-tk"].opt_lib}/pkgconfig"
+#    ENV.append 'TCL_INCLUDE_SPEC', "-I#{Formula["tcl-tk"].opt_include}"
+#    ENV.append 'TK_INCLUDE_SPEC', "-I#{Formula["tcl-tk"].opt_include}"
+#    ENV.append 'TKGATE_IPATH', "-I#{Formula["tcl-tk"].opt_include}"
+#    ENV.append 'TCL_IPATH', "-I#{Formula["tcl-tk"].opt_include}"
+#    ENV.append 'TK_IPATH', "-I#{Formula["tcl-tk"].opt_include}"
     ENV.append 'CPPFLAGS', "-DUSE_INTERP_RESULT"
     system "./configure",
                           "--disable-dependency-tracking",
@@ -25,10 +33,18 @@ end
 
 __END__
 diff --git a/configure b/configure
-index d0a164f..e995950 100755
 --- a/configure
 +++ b/configure
-@@ -22091,7 +22091,7 @@ echo $ECHO_N "checking for iconv.h... $ECHO_C" >&6; }
+@@ -2916,7 +2916,7 @@
+ #
+ # Directories to search for library files
+ #
+-TKGATE_LIBDIRS="/usr/X11R6/lib /usr/X11/lib /pkgs/lib /usr/local/lib /usr/lib /sw/lib /opt/local/lib /usr/local/lib/tcl /usr/lib64"
++TKGATE_LIBDIRS="/usr/local/opt/tcl-tk/lib /usr/X11R6/lib /usr/X11/lib /pkgs/lib /usr/local/lib /usr/lib /sw/lib /opt/local/lib /usr/local/lib/tcl /usr/lib64"
+
+ #
+ # Libraries we may need if available.
+@@ -6024,7 +6024,7 @@ $as_echo_n "checking for iconv.h... " >&6; }
      fi
    done
    for p in $TKGATE_LIBDIRS; do
@@ -37,7 +53,39 @@ index d0a164f..e995950 100755
        iconv_lib_dir=$p
      fi
    done
-@@ -24445,7 +24445,7 @@ _ACEOF
+@@ -6818,10 +6818,10 @@ $as_echo_n "checking tcl/tk version... " >&6; }
+
+   TCL_LIB=$TCL_LIB_SPEC
+   TCL_LPATH=""
+-  TCL_IPATH=$TCL_INCLUDE_SPEC
++  #TCL_IPATH=$TCL_INCLUDE_SPEC
+   TK_LIB=$TK_LIB_SPEC
+   TK_LPATH=""
+-  TK_IPATH=$TK_INCLUDE_SPEC
++  #TK_IPATH=$TK_INCLUDE_SPEC
+
+   if test "X$TCL_IPATH" = "X"; then
+
+@@ -7294,10 +7294,14 @@ $as_echo "#define TKGATE_WORDSIZE 64" >>confdefs.h
+    for v in $TCL_IPATH $TK_IPATH $X_CFLAGS $ICONV_IPATH; do
+      add_ok=1
+      for q in $L; do
+-	if test X$q = X$v; then
+-	  add_ok=0
+-	  break
+-        fi
++#       if test X$q != X"-F/System/Library/Frameworks"; then
++#         if test X$q != X"-framework"; then
++           if test X$q = X$v; then
++             add_ok=0
++             break
++           fi
++#         fi
++#       fi
+      done
+      if test "$add_ok" = "1"; then
+        L="$L $v"
+@@ -7307,7 +7311,7 @@ $as_echo "#define TKGATE_WORDSIZE 64" >>confdefs.h
  
  
     L=""
@@ -46,7 +94,7 @@ index d0a164f..e995950 100755
       add_ok=1
       for q in $L; do
  	if test X$q = X$v; then
-@@ -24464,10 +24464,14 @@ _ACEOF
+@@ -7326,10 +7330,14 @@ $as_echo "#define TKGATE_WORDSIZE 64" >>confdefs.h
     for v in $TCL_LIB $TK_LIB $X_PRE_LIBS -lX11 $X_EXTRA_LIBS $ICONV_LIB; do
       add_ok=1
       for q in $L; do
@@ -54,14 +102,38 @@ index d0a164f..e995950 100755
 -	  add_ok=0
 -	  break
 -        fi
-+       if test X$q != X"-F/System/Library/Frameworks"; then
-+         if test X$q != X"-framework"; then
++#       if test X$q != X"-F/System/Library/Frameworks"; then
++#         if test X$q != X"-framework"; then
 +           if test X$q = X$v; then
 +             add_ok=0
 +             break
 +           fi
-+         fi
-+       fi
++#         fi
++#       fi
       done
       if test "$add_ok" = "1"; then
         L="$L $v"
+diff --git a/src/common/list.c b/src/common/list.c
+--- a/src/common/list.c
++++ b/src/common/list.c
+@@ -16,7 +16,6 @@
+     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ ****************************************************************************/
+ #include <stdlib.h>
+-#include <malloc.h>
+ #include "misc.h"
+ #include "list.h"
+
+diff --git a/src/common/misc.h b/src/common/misc.h
+--- a/src/common/misc.h
++++ b/src/common/misc.h
+@@ -34,9 +34,6 @@
+ #if !HAVE_STRNCASECMP
+ int strncasecmp(const char *s1,const char *s2,size_t n);
+ #endif
+-#if !HAVE_STRCASESTR
+-const char *strcasestr(const char *big,const char *little);
+-#endif
+ #if !HAVE_STRSPN
+ size_t strspn(const char *s,const char *charset);
+ #endif
