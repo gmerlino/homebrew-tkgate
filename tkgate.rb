@@ -5,7 +5,7 @@ class Tkgate < Formula
   head "https://bitbucket.org/starling13/tkgate", :using => :hg
 
   depends_on "cairo" => "with-x11"
-  depends_on "pango" => "with-x11"
+  depends_on "gmerlino/pango/pango" => "with-x11"
   depends_on "gmerlino/tcl-tk/tcl-tk" => "with-x11"
 
   patch :DATA
