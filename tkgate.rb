@@ -1,10 +1,9 @@
-require "formula"
-
 class Tkgate < Formula
+  desc "Event-driven digital circuit simulator with graphical editor"
   homepage "https://bitbucket.org/starling13/tkgate"
   head "https://bitbucket.org/starling13/tkgate", :using => :hg
 
-  depends_on "cairo" => "with-x11"
+  depends_on "gmerlino/cairo/cairo" => "with-x11"
   depends_on "gmerlino/pango/pango" => "with-x11"
   depends_on "gmerlino/tcl-tk/tcl-tk" => "with-x11"
 
@@ -12,9 +11,9 @@ class Tkgate < Formula
 
   def install
     ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["tcl-tk"].opt_lib}/pkgconfig"
-    ENV.append 'TCL_IPATH', "-I#{Formula["tcl-tk"].opt_include}"
-    ENV.append 'TCL_LPATH', "-L#{Formula["tcl-tk"].opt_lib}"
-    ENV.append 'CPPFLAGS', "-g"
+    ENV.append "TCL_IPATH", "-I#{Formula["tcl-tk"].opt_include}"
+    ENV.append "TCL_LPATH", "-L#{Formula["tcl-tk"].opt_lib}"
+    ENV.append "CPPFLAGS", "-g"
     system "./configure",
                           "--disable-dependency-tracking",
                           "--disable-silent-rules",
