@@ -3,7 +3,6 @@ class Tkgate < Formula
   homepage "https://bitbucket.org/starling13/tkgate"
   head "https://bitbucket.org/starling13/tkgate", :using => :hg
 
-  depends_on "gmerlino/cairo/cairo" => "with-x11"
   depends_on "gmerlino/pango/pango" => "with-x11"
   depends_on "gmerlino/tcl-tk/tcl-tk" => "with-x11"
 
