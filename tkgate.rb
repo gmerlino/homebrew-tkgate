@@ -3,15 +3,17 @@ class Tkgate < Formula
   homepage "https://bitbucket.org/starling13/tkgate"
   head "https://bitbucket.org/starling13/tkgate", :using => :hg
 
+  depends_on "gmerlino/cairo/cairo" => "with-x11"
   depends_on "gmerlino/pango/pango" => "with-x11"
   depends_on "gmerlino/tcl-tk/tcl-tk" => "with-x11"
 
   patch :DATA
 
   def install
-    ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["tcl-tk"].opt_lib}/pkgconfig"
-    ENV.append "TCL_IPATH", "-I#{Formula["tcl-tk"].opt_include}"
-    ENV.append "TCL_LPATH", "-L#{Formula["tcl-tk"].opt_lib}"
+    tcltk = Formula["gmerlino/tcl-tk/tcl-tk"]
+    ENV.prepend_path "PKG_CONFIG_PATH", "#{tcltk.opt_lib}/pkgconfig"
+    ENV.append "TCL_IPATH", "-I#{tcltk.opt_include}"
+    ENV.append "TCL_LPATH", "-L#{tcltk.opt_lib}"
     ENV.append "CPPFLAGS", "-g"
     system "./configure",
                           "--disable-dependency-tracking",
